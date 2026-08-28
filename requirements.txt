@@ -1,0 +1,6 @@
+Flask
+openai
+paramiko
+python-dotenv
+requests
+rich

@@ -1,0 +1,15 @@
+.venv/
+.env
+.env.*
+!.env.example
+__pycache__/
+*.py[cod]
+*.log
+*.pid
+logs/
+reports/*
+!reports/.gitkeep
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
