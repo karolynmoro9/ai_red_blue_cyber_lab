@@ -1,51 +1,58 @@
-# windows-security-lab
-Windows endpoint investigation lab using Sysmon, Event Viewer, Process Explorer, Autoruns, and Wireshark.
+# AI Red vs. Blue Cybersecurity Lab
 
-Objective:
-The purpose of this lab was to practice basic Windows endpoint investigation using Sysmon, Event Viewer, Process Explorer, Autoruns, and Wireshark/Npcap. The lab focused on tracking process execution, DNS activity, network connections, and persistence locations.
+An automated cybersecurity lab that simulates interaction between offensive and defensive agents. The Red Agent generates realistic authentication activity, while the Blue Agent monitors events, detects suspicious behavior, and responds according to predefined security thresholds.
 
-Tools Used:
-- Sysmon
-- Windows Event Viewer
-- Process Explorer
-- Autoruns
-- Wireshark / Npcap
-- PowerShell 
+## Project Objective
 
-Lab Activity:
-I began test activity by running commands from PowerShell, including curl.exe, nslookup, ping, and notepad.exe. This created process, DNS, and network artifacts that could be reviewed using Sysmon and Windows analysis tools.
+The purpose of this project was to build a controlled environment for practicing:
 
-Findings:
+- Red and Blue Team concepts
+- Authentication-log analysis
+- Brute-force detection
+- Automated alerting and containment
+- Python security automation
+- Agent-based cybersecurity workflows
 
-1. Process Creation:
-Sysmon Event ID 1 showed curl.exe being launched from PowerShell. The command line showed curl.exe connecting to https://www.google.com. The parent process was powershell.exe, which confirmed that the activity was manually generated during the lab.
+## How It Works
 
-<img width="752" height="674" alt="Event1_CyberLab" src="https://github.com/user-attachments/assets/937af8b4-a85e-4cca-9b0e-001806d95fd3" />
+1. The Red Agent performs simulated login attempts against the local target service.
+2. The target records successful and failed authentication events.
+3. The Blue Agent analyzes the activity for suspicious patterns.
+4. Repeated failures trigger alerts and escalation.
+5. The Blue Agent can block the simulated client after the containment threshold is reached.
 
-2. Network Connection:
-Sysmon Event ID 3 showed outbound network connection activity. One observed event showed chrome.exe using UDP traffic to destination port 53, which is commonly associated with DNS traffic. The hostname console.gl-inet.com appeared related to the router/repeater environment.
+## Detection Logic
 
-<img width="751" height="593" alt="Event3_CyberLab" src="https://github.com/user-attachments/assets/164ee8f6-8a57-4b55-bd0f-dbc4ff5be08a" />
+The Blue Agent evaluates several patterns:
 
-3. DNS Query:
-Sysmon Event ID 22 showed svchost.exe performing a DNS query for v10.events.data.microsoft.com. The query succeeded and returned Microsoft traffic management results. This appeared consistent with normal Windows background telemetry activity.
+- **Initial assessment:** Triggered after 2 failed login attempts
+- **Escalated alert:** Triggered after 4 failed attempts
+- **Possible compromise:** Triggered when failed attempts are followed by a successful login
+- **Containment:** Blocks the simulated client when the configured threshold is reached
 
-<img width="758" height="598" alt="Event22_CyberLab" src="https://github.com/user-attachments/assets/1a956aee-b42d-43c5-ba8d-f79736d27b01" />
+## Test Scenarios
 
-4. Live Process Review:
-Process Explorer was used to inspect notepad.exe after launching it from PowerShell. The process ran from the expected Windows System32 directory and showed a normal parent-child relationship between powershell.exe and notepad.exe.
+### Benign Activity
 
-5. Persistence Review:
-Autoruns was used to review Logon entries, Scheduled Tasks, and Services. These areas were reviewed because attackers may use them to maintain persistence after reboot or user login. No suspicious persistence was identified. NpcapWatchdog was observed, but it appeared consistent with the Wireshark/Npcap lab setup.
+A single login attempt used to confirm that ordinary activity does not generate unnecessary alerts.
 
-<img width="1166" height="539" alt="autoruns-logon-tab" src="https://github.com/user-attachments/assets/17d7ad35-7307-47d5-9845-13639ff9b44f" />
+### Brute-Force Activity
 
-<img width="362" height="506" alt="autoruns-scheduled-tasks" src="https://github.com/user-attachments/assets/bcf4ae2e-99aa-4574-8048-a8fb9dde5af0" />
+Multiple failed login attempts used to test detection, escalation, and automated blocking.
 
-<img width="806" height="543" alt="autoruns-services-tab" src="https://github.com/user-attachments/assets/55870b32-0ee6-4464-8202-333266d73a81" />
+### Compromise Simulation
 
-Assessment:
-The process execution, DNS lookups, and network connections were either manually generated during the lab or related to known Windows/router activity. No suspicious executable path, unknown command line, abnormal persistence mechanism, or clearly malicious external destination was identified.
+A sequence of failed attempts followed by a successful login, representing a potentially compromised account.
 
-Conclusion:
-This lab demonstrated how Sysmon, Event Viewer, Process Explorer, Autoruns, and Wireshark can be used together to investigate endpoint activity. The skills used included reviewing process creation events, identifying parent-child process relationships, checking DNS and network activity, reviewing startup persistence, and writing an analyst-style incident summary.
+## Project Structure
+
+```text
+ai_red_blue_cyber_lab/
+├── agents/                 # Red and Blue Agent logic
+├── reports/                # Generated security reports and results
+├── target/                 # Local target service
+├── cowrie_coordinator.py   # Coordinates Cowrie-based lab activity
+├── livelab.py              # Runs the live lab workflow
+├── requirements.txt        # Python dependencies
+├── .env.example            # Example environment configuration
+└── README.md               # Project documentation
